@@ -2,251 +2,104 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>LinguaVerse Pro — Английский с Аниме</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LinguaVerse Pro</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0a0a18;
-      --surface: rgba(16, 16, 40, 0.92);
-      --pink: #f9a8d4;
-      --pink2: #f472b6;
-      --purple: #c4b5fd;
-      --cyan: #67e8f9;
-      --success: #34d399;
-      --danger: #f87171;
-      --gold: #fbbf24;
-      --text: #f8fafc;
-      --text2: #94a3b8;
-      --border: rgba(255,255,255,0.06);
-      --radius: 16px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    html, body { height: 100%; }
     body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
+      background: #0a0a18;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
       overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
     }
-    #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
     .splash {
-      position: fixed; inset: 0; z-index: 1000;
-      background: #0a0a18; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #0a0a18;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.8s ease;
     }
     .splash.hide { opacity: 0; pointer-events: none; }
     .splash-char { font-size: 80px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
     @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
     .splash h1 { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #f9a8d4, #c4b5fd, #67e8f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .splash p { color: var(--text2); margin: 8px 0 20px; font-size: 14px; }
+    .splash p { color: #94a3b8; margin: 8px 0 20px; font-size: 14px; }
     .splash-input { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .splash-input input { padding: 12px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; outline: none; font-family: var(--font); width: 220px; text-align: center; }
+    .splash-input input { padding: 12px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; outline: none; width: 220px; text-align: center; }
     .splash-input input:focus { border-color: #f9a8d4; }
-    .splash-input button { padding: 12px 30px; border-radius: 50px; border: none; background: linear-gradient(135deg, #f9a8d4, #c4b5fd); color: #1a1a2e; font-weight: 800; font-size: 16px; cursor: pointer; font-family: var(--font); }
-
-    .app { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-
-    .header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 12px; background: var(--surface); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border); z-index: 10; flex-shrink: 0;
-    }
-    .header .logo { font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-    .logo .icon { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #f9a8d4, #c4b5fd); display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    .menu-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 4px 8px; }
-
-    .main-scroll {
-      flex: 1; overflow-y: auto; padding: 8px 10px 70px; -webkit-overflow-scrolling: touch;
-    }
-    .main-scroll::-webkit-scrollbar { width: 3px; }
-    .main-scroll::-webkit-scrollbar-thumb { background: var(--pink2); border-radius: 10px; }
-
-    .top-row {
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;
-    }
-    .greeting { font-size: 18px; font-weight: 800; }
-    .greeting .gname { background: linear-gradient(135deg, #f9a8d4, #c4b5fd, #67e8f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .chips { display: flex; gap: 4px; flex-wrap: wrap; }
-    .chip { display: flex; align-items: center; gap: 3px; padding: 3px 10px; border-radius: 50px; background: var(--surface); border: 1px solid var(--border); font-size: 10px; font-weight: 600; }
-    .chip.gem { color: #22d3ee; }
-    .hearts { display: flex; gap: 1px; }
-    .hearts span { font-size: 13px; }
-    .hearts span.empty { filter: grayscale(1); opacity: 0.2; }
-
-    .anime-box {
-      position: relative; width: 100%; height: 260px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
-      cursor: pointer; margin-bottom: 6px;
-    }
-    #animeCanvas { width: 100%; height: 100%; display: block; }
-    .anime-speech {
-      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-      background: rgba(255,255,255,0.95); color: #1a1a1a; padding: 6px 18px; border-radius: 20px;
-      font-weight: 700; font-size: 12px; pointer-events: none; opacity: 0;
-      transition: all 0.4s; white-space: nowrap; z-index: 5;
-    }
-    .anime-speech.show { opacity: 1; top: 4px; }
-    .anime-status {
-      position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: var(--text2); opacity: 0.6;
-      font-weight: 600; background: rgba(0,0,0,0.4); padding: 2px 10px; border-radius: 12px;
-    }
-
-    .xp-bar-wrap { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
-    .xp-outer { flex: 1; height: 8px; background: rgba(255,255,255,0.04); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
-    .xp-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #f9a8d4, #c4b5fd, #67e8f9); transition: width 0.5s; }
-    .xp-label { font-weight: 700; font-size: 9px; color: var(--text2); min-width: 50px; text-align: right; }
-
+    .splash-input button { padding: 12px 30px; border-radius: 50px; border: none; background: linear-gradient(135deg, #f9a8d4, #c4b5fd); color: #1a1a2e; font-weight: 800; font-size: 16px; cursor: pointer; }
+    .app { position: relative; z-index: 1; text-align: center; max-width: 800px; width: 100%; }
     .card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 12px 14px; backdrop-filter: blur(20px);
-      display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;
+      background: rgba(16,16,40,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    .badge { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 2px 10px; border-radius: 20px; display: inline-block; width: fit-content; }
-    .badge.pink { background: rgba(249,168,212,0.2); color: #fbcfe8; }
-    .badge.purple { background: rgba(196,181,253,0.2); color: #ddd6fe; }
-    .badge.cyan { background: rgba(103,232,249,0.2); color: #a5f3fc; }
-    .badge.green { background: rgba(52,211,153,0.2); color: #6ee7b7; }
-    .badge.gold { background: rgba(251,191,36,0.2); color: #fcd34d; }
-    .badge.orange { background: rgba(251,146,60,0.2); color: #fdba74; }
-
-    .question { font-size: 15px; font-weight: 700; line-height: 1.5; text-align: center; }
-    .question .hint { font-size: 12px; font-weight: 400; color: var(--text2); display: block; margin-top: 4px; }
-    .explanation {
-      font-size: 11px; line-height: 1.6; padding: 8px 12px; border-radius: 10px;
-      background: rgba(255,255,255,0.03); color: var(--text2); min-height: 16px;
-    }
-    .explanation.ok { background: rgba(52,211,153,0.15); color: #6ee7b7; border-left: 3px solid #34d399; }
-    .explanation.err { background: rgba(248,113,113,0.15); color: #fca5a5; border-left: 3px solid #f87171; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-    .opt-btn {
-      padding: 10px 8px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.02); color: #fff; font-size: 12px; font-weight: 600;
-      cursor: pointer; font-family: var(--font); text-align: center;
-      transition: all 0.2s;
-    }
-    .opt-btn:active { transform: scale(0.95); }
-    .opt-btn.correct { background: #34d399 !important; border-color: #34d399 !important; }
-    .opt-btn.wrong { background: #f87171 !important; border-color: #f87171 !important; }
-    .write-inp {
-      width: 100%; padding: 10px 14px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.02); color: #fff; font-size: 13px; font-weight: 600;
-      text-align: center; outline: none; font-family: var(--font);
-    }
-    .write-inp:focus { border-color: #f9a8d4; }
-    textarea.write-inp { border-radius: 10px; text-align: left; min-height: 70px; resize: vertical; }
+    .card h2 { font-size: 24px; margin-bottom: 8px; background: linear-gradient(135deg, #f9a8d4, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card p { color: #94a3b8; font-size: 14px; line-height: 1.6; }
     .btn {
-      padding: 9px 16px; border-radius: 50px; border: none; font-weight: 700;
-      font-size: 11px; cursor: pointer; font-family: var(--font); text-align: center;
+      display: inline-block;
+      padding: 12px 30px;
+      border-radius: 50px;
+      border: none;
+      background: linear-gradient(135deg, #f9a8d4, #c4b5fd);
+      color: #1a1a2e;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: transform 0.2s;
     }
-    .btn-primary { background: linear-gradient(135deg, #f9a8d4, #c4b5fd); color: #1a1a2e; font-weight: 800; }
-    .btn-ghost { background: transparent; border: 2px solid rgba(255,255,255,0.1); color: var(--text2); font-size: 9px; }
-    .btn-row { display: flex; gap: 6px; }
-    .btn-row .btn-primary { flex: 1; }
-    .hidden { display: none !important; }
-
-    .chat-area { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 10px; min-height: 140px; }
-    .chat-msg { padding: 6px 10px; border-radius: 12px; font-size: 11px; max-width: 80%; line-height: 1.4; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-    .chat-msg.you { background: linear-gradient(135deg, #c4b5fd, #f9a8d4); color: #1a1a2e; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .chat-msg.other { background: rgba(255,255,255,0.07); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .chat-msg .author { font-size: 8px; font-weight: 700; opacity: 0.7; display: block; margin-bottom: 2px; }
-
-    .quick-phrases { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-    .quick-phrase { padding: 4px 12px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); font-size: 9px; cursor: pointer; color: var(--text2); }
-    .quick-phrase:active { background: rgba(249,168,212,0.2); }
-
-    .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px,1fr)); gap: 5px; }
-    .word-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; }
-    .word-tile:active { transform: scale(0.95); }
-    .word-en { font-weight: 700; font-size: 11px; }
-    .word-ru { font-size: 8px; color: var(--text2); }
-
-    .bottom-nav {
-      display: flex; position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--surface); backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border); z-index: 50;
-      padding: 2px 0; padding-bottom: env(safe-area-inset-bottom);
-      justify-content: space-around; flex-shrink: 0;
+    .btn:hover { transform: scale(1.05); }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+      text-align: left;
     }
-    .nav-btn {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      padding: 4px 2px; border: none; background: transparent;
-      color: var(--text2); font-size: 6px; font-weight: 600;
-      cursor: pointer; font-family: var(--font);
+    .features li {
+      list-style: none;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+      color: #94a3b8;
     }
-    .nav-btn .ni { font-size: 20px; }
-    .nav-btn.active { color: #f9a8d4; }
-
-    .menu-overlay {
-      position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,0.6);
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
-    .menu-overlay.open { opacity: 1; pointer-events: auto; }
-    .menu-panel {
-      position: fixed; top: 0; left: 0; width: 280px; height: 100%;
-      background: var(--surface); backdrop-filter: blur(30px);
-      transform: translateX(-100%); transition: transform 0.3s;
-      z-index: 70; padding: 12px 10px; overflow-y: auto;
-      border-right: 1px solid var(--border);
-    }
-    .menu-panel.open { transform: translateX(0); }
-    .menu-panel .m-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; display: block; margin-left: auto; padding: 4px 8px; }
-    .menu-panel .sb-section { font-size: 8px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--text2); padding: 12px 8px 4px; font-weight: 700; }
-    .menu-panel .sb-btn {
-      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px;
-      border: none; background: transparent; color: var(--text2); font-size: 12px;
-      font-weight: 500; cursor: pointer; font-family: var(--font); text-align: left; width: 100%;
-    }
-    .menu-panel .sb-btn.active { background: rgba(244,114,182,0.16); color: #fff; font-weight: 600; }
-    .menu-panel .sb-btn .sb-icon { font-size: 16px; width: 22px; text-align: center; }
-    .menu-panel .theme-btn { margin-top: 8px; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: #fff; font-size: 9px; font-weight: 600; cursor: pointer; font-family: var(--font); text-align: center; width: 100%; }
-
-    .toast {
-      position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%) translateY(100px);
-      z-index: 300; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 11px;
-      pointer-events: none; opacity: 0; transition: all 0.4s;
-      background: var(--surface); border: 1px solid var(--border);
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast.ok { border-color: #34d399; color: #6ee7b7; }
-    .toast.bad { border-color: #f87171; color: #fca5a5; }
-
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 400;
-      display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box { background: linear-gradient(135deg, #1a1a35, #2a1a40); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center; max-width: 320px; width: 90%; }
-    .modal-box h2 { font-size: 24px; margin-bottom: 4px; }
-    .modal-box p { color: var(--text2); margin-bottom: 14px; font-size: 13px; }
-
-    .theme-modal {
-      position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.75);
-      display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
-    .theme-modal.open { opacity: 1; pointer-events: auto; }
-    .theme-grid { background: #1a1a30; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; max-width: 340px; width: 90%; max-height: 60vh; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-    .theme-opt { padding: 10px 4px; border-radius: 10px; border: 2px solid transparent; background: rgba(255,255,255,0.03); cursor: pointer; text-align: center; font-size: 9px; font-weight: 600; color: #fff; font-family: var(--font); }
-    .theme-opt.active { border-color: #f9a8d4; background: rgba(249,168,212,0.12); }
-    .theme-opt .t-emoji { font-size: 24px; display: block; margin-bottom: 2px; }
-
+    .features li span { margin-right: 8px; }
     @media (max-width: 480px) {
-      .anime-box { height: 200px; }
-      .greeting { font-size: 15px; }
-      .question { font-size: 13px; }
-      .opt-btn { font-size: 11px; padding: 8px 6px; }
-      .btn { font-size: 10px; padding: 8px 12px; }
       .splash h1 { font-size: 24px; }
       .splash-input input { width: 160px; font-size: 14px; }
+      .card { padding: 20px; }
+      .features { grid-template-columns: 1fr; }
+      .card h2 { font-size: 20px; }
     }
   </style>
 </head>
 <body>
-  <!-- SPLASH -->
+  <canvas id="bgCanvas"></canvas>
+  
   <div class="splash" id="splash">
     <div class="splash-char">🌸</div>
     <h1>LinguaVerse Pro</h1>
@@ -257,235 +110,46 @@
     </div>
   </div>
 
-  <canvas id="bgCanvas"></canvas>
-  
-  <div class="app">
-    <header class="header">
-      <div class="logo"><div class="icon">🌸</div>Lingua<span style="color:#f9a8d4">Verse</span></div>
-      <button class="menu-btn" id="menuBtn">☰</button>
-    </header>
-
-    <div class="main-scroll" id="mainScroll">
-      <div class="top-row">
-        <div class="greeting">Привет, <span class="gname" id="displayName">студент</span>! ✨</div>
-        <div class="chips">
-          <div class="chip gem">💎 <span id="gemsVal">50</span></div>
-          <div class="chip"><div class="hearts" id="heartsRow"></div></div>
-        </div>
-      </div>
-
-      <div class="anime-box" id="animeBox">
-        <div class="anime-speech" id="animeSpeech">Привет! Я Мисаки 🌸</div>
-        <canvas id="animeCanvas"></canvas>
-        <div class="anime-status" id="animeStatus">🌸 Счастлива</div>
-      </div>
-
-      <div class="xp-bar-wrap">
-        <div class="xp-outer"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
-        <span class="xp-label" id="xpLabel">0/100</span>
-      </div>
-
-      <!-- PAGES -->
-      <div id="pageTranslate"><div class="card">
-        <span class="badge pink">📝 ПЕРЕВОД</span>
-        <div class="question" id="transQ"></div>
-        <div class="grid2" id="transGrid"></div>
-        <div class="write-row hidden" id="transWriteRow"><input class="write-inp" id="transWriteInp" placeholder="Введи перевод..."></div>
-        <div class="explanation" id="transExplanation"></div>
-        <div class="btn-row"><button class="btn btn-primary" id="transCheck">ПРОВЕРИТЬ</button><button class="btn btn-ghost" id="transSkip">Пропустить</button></div>
-        <div id="transExample" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-      </div></div>
-
-      <div id="pageGrammar" class="hidden"><div class="card">
-        <span class="badge purple">📐 ГРАММАТИКА</span>
-        <div class="question" id="gramQ"></div>
-        <div class="grid2" id="gramGrid"></div>
-        <div class="explanation" id="gramExplanation"></div>
-        <div id="gramRule" style="font-size:10px;color:var(--purple);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="gramCheck">СЛЕДУЮЩИЙ</button>
-      </div></div>
-
-      <div id="pageListening" class="hidden"><div class="card">
-        <span class="badge cyan">🎧 АУДИРОВАНИЕ</span>
-        <div class="question" id="listenQ"></div>
-        <button class="btn btn-ghost" id="listenPlay" style="width:100%;">🔊 Прослушать</button>
-        <input class="write-inp" id="listenInp" placeholder="Напиши, что услышал...">
-        <div class="explanation" id="listenExplanation"></div>
-        <div id="listenExtra" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="listenCheck">ПРОВЕРИТЬ</button>
-      </div></div>
-
-      <div id="pageSpeaking" class="hidden"><div class="card">
-        <span class="badge orange">🎤 ПРОИЗНОШЕНИЕ</span>
-        <div class="question" id="speakQ"></div>
-        <div id="speakHint" style="font-size:10px;color:var(--text2);text-align:center;"></div>
-        <button class="btn btn-primary" id="speakRec" style="width:100%;">🎤 Начать запись</button>
-        <input class="write-inp" id="speakInp" placeholder="Результат..." readonly>
-        <div class="explanation" id="speakExplanation"></div>
-        <button class="btn btn-primary" id="speakCheck">ПРОВЕРИТЬ</button>
-      </div></div>
-
-      <div id="pageReading" class="hidden"><div class="card">
-        <span class="badge green">📖 ЧТЕНИЕ</span>
-        <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:10px;font-size:12px;line-height:1.6;" id="readingText"></div>
-        <div class="question" id="readingQ"></div>
-        <div class="grid2" id="readingGrid"></div>
-        <div class="explanation" id="readingExplanation"></div>
-        <div id="readingNewWords" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="readingCheck">СЛЕДУЮЩИЙ</button>
-      </div></div>
-
-      <div id="pageWriting" class="hidden"><div class="card">
-        <span class="badge purple">🖊️ ПИСЬМО</span>
-        <div class="question" id="writingQ"></div>
-        <div id="writingTips" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-        <textarea class="write-inp" id="writingInp" placeholder="Напиши ответ..." style="min-height:70px;text-align:left;border-radius:10px;"></textarea>
-        <div class="explanation" id="writingExplanation"></div>
-        <button class="btn btn-primary" id="writingCheck">ПРОВЕРИТЬ</button>
-      </div></div>
-
-      <div id="pageQuiz" class="hidden"><div class="card">
-        <span class="badge gold">🧠 ВИКТОРИНА</span>
-        <div class="question" id="quizQ"></div>
-        <div class="grid2" id="quizGrid"></div>
-        <div class="explanation" id="quizExplanation"></div>
-        <div id="quizFact" style="font-size:10px;color:var(--cyan);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="quizCheck">СЛЕДУЮЩИЙ</button>
-      </div></div>
-
-      <div id="pageIdioms" class="hidden"><div class="card">
-        <span class="badge green">💡 ИДИОМЫ</span>
-        <div class="question" id="idiomsQ"></div>
-        <div class="grid2" id="idiomsGrid"></div>
-        <div class="explanation" id="idiomsExplanation"></div>
-        <div id="idiomsExtra" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="idiomsCheck">СЛЕДУЮЩИЙ</button>
-      </div></div>
-
-      <div id="pagePhrasal" class="hidden"><div class="card">
-        <span class="badge cyan">🔗 ФРАЗОВЫЕ</span>
-        <div class="question" id="phrasalQ"></div>
-        <div class="grid2" id="phrasalGrid"></div>
-        <div class="explanation" id="phrasalExplanation"></div>
-        <div id="phrasalExtra" style="font-size:10px;color:var(--text2);text-align:center;padding:4px;"></div>
-        <button class="btn btn-primary" id="phrasalCheck">СЛЕДУЮЩИЙ</button>
-      </div></div>
-
-      <div id="pageChat" class="hidden"><div class="card">
-        <span class="badge cyan">💬 ЧАТ</span>
-        <div class="chat-area" id="chatArea"></div>
-        <div class="quick-phrases" id="quickPhrases">
-          <span class="quick-phrase" data-text="Hello! How are you?">👋 Привет!</span>
-          <span class="quick-phrase" data-text="I'm learning English!">📚 Учу английский</span>
-          <span class="quick-phrase" data-text="This is cool!">😮 Круто!</span>
-          <span class="quick-phrase" data-text="Can you help me?">🤝 Поможешь?</span>
-        </div>
-        <div style="display:flex;gap:6px;"><input class="write-inp" id="chatInput" placeholder="Сообщение..." style="text-align:left;flex:1;"><button class="btn btn-primary" id="chatSend">Отпр.</button></div>
-      </div></div>
-
-      <div id="pageLeaderboard" class="hidden"><div class="card"><h3>🏆 Рейтинг</h3><div id="leaderboardList"></div></div></div>
-      <div id="pageVocabulary" class="hidden"><div class="card"><h3>📖 Словарь</h3><div class="word-grid" id="vocabGrid"></div><p style="color:var(--text2);text-align:center;margin-top:6px;font-size:11px;" id="vocabEmpty">Нет слов. Пройди уроки!</p></div></div>
-      <div id="pageStats" class="hidden"><div class="card"><h3>📊 Статистика</h3><p style="font-size:12px;">⭐ Очков: <b id="statScore">0</b> | 🔥 Серия: <b id="statStreak">0</b> | ✅ Правильно: <b id="statCorrect">0</b> | 📈 Уровень: <b id="statLevel">1</b> | 📖 Слов: <b id="statWords">0</b></p></div></div>
+  <div class="app" id="app" style="display:none;">
+    <div class="card">
+      <h2>🌸 LinguaVerse Pro</h2>
+      <p>Привет, <span id="displayName">студент</span>! Добро пожаловать в мир изучения английского с аниме-девушкой Мисаки!</p>
+      <ul class="features">
+        <li><span>📝</span> Перевод слов</li>
+        <li><span>📐</span> Грамматика</li>
+        <li><span>🎧</span> Аудирование</li>
+        <li><span>🎤</span> Произношение</li>
+        <li><span>📖</span> Чтение</li>
+        <li><span>🖊️</span> Письмо</li>
+        <li><span>🧠</span> Викторина</li>
+        <li><span>💡</span> Идиомы</li>
+        <li><span>🔗</span> Фразовые глаголы</li>
+        <li><span>💬</span> Чат</li>
+        <li><span>📖</span> Словарь</li>
+        <li><span>📊</span> Статистика</li>
+      </ul>
+      <button class="btn" onclick="location.reload()">🚀 Начать обучение</button>
+      <p style="font-size:11px;color:#4a4a6a;margin-top:12px;">✨ 13 разделов для полного погружения</p>
     </div>
-
-    <nav class="bottom-nav" id="bottomNav">
-      <button class="nav-btn active" data-nav="translate"><span class="ni">📝</span>Перевод</button>
-      <button class="nav-btn" data-nav="grammar"><span class="ni">📐</span>Грамм.</button>
-      <button class="nav-btn" data-nav="listening"><span class="ni">🎧</span>Аудио</button>
-      <button class="nav-btn" data-nav="speaking"><span class="ni">🎤</span>Речь</button>
-      <button class="nav-btn" data-nav="chat"><span class="ni">💬</span>Чат</button>
-    </nav>
   </div>
-
-  <!-- MENU -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <div class="menu-panel" id="menuPanel">
-    <button class="m-close" id="menuClose">✕</button>
-    <div class="sb-section">Обучение</div>
-    <button class="sb-btn active" data-nav="translate"><span class="sb-icon">📝</span> Перевод</button>
-    <button class="sb-btn" data-nav="grammar"><span class="sb-icon">📐</span> Грамматика</button>
-    <button class="sb-btn" data-nav="listening"><span class="sb-icon">🎧</span> Аудирование</button>
-    <button class="sb-btn" data-nav="speaking"><span class="sb-icon">🎤</span> Произношение</button>
-    <div class="sb-section">Практика</div>
-    <button class="sb-btn" data-nav="reading"><span class="sb-icon">📖</span> Чтение</button>
-    <button class="sb-btn" data-nav="writing"><span class="sb-icon">🖊️</span> Письмо</button>
-    <button class="sb-btn" data-nav="quiz"><span class="sb-icon">🧠</span> Викторина</button>
-    <button class="sb-btn" data-nav="idioms"><span class="sb-icon">💡</span> Идиомы</button>
-    <button class="sb-btn" data-nav="phrasal"><span class="sb-icon">🔗</span> Фраз. глаголы</button>
-    <div class="sb-section">Сообщество</div>
-    <button class="sb-btn" data-nav="chat"><span class="sb-icon">💬</span> Чат</button>
-    <button class="sb-btn" data-nav="leaderboard"><span class="sb-icon">🏆</span> Рейтинг</button>
-    <div class="sb-section">Ещё</div>
-    <button class="sb-btn" data-nav="vocabulary"><span class="sb-icon">📖</span> Словарь</button>
-    <button class="sb-btn" data-nav="stats"><span class="sb-icon">📊</span> Статистика</button>
-    <button class="theme-btn" id="themeBtnMenu">🎨 10 тем фона</button>
-  </div>
-
-  <div class="toast" id="toast"></div>
-  <div class="modal-overlay" id="levelModal"><div class="modal-box"><h2>🎉 Уровень повышен!</h2><p id="levelModalText"></p><button class="btn btn-primary" id="levelModalClose" style="width:100%;">КРУТО!</button></div></div>
-  <div class="theme-modal" id="themeModal"><div class="theme-grid" id="themeGrid"></div></div>
 
   <script>
-    // ===== SPLASH =====
-    const splash = document.getElementById('splash');
-    const splashName = document.getElementById('splashName');
-    const splashBtn = document.getElementById('splashBtn');
-    let userName = localStorage.getItem('lingua_name') || 'студент';
-    splashName.value = userName;
-
-    splashBtn.addEventListener('click', () => {
-      const name = splashName.value.trim() || 'студент';
-      localStorage.setItem('lingua_name', name);
-      userName = name;
-      document.getElementById('displayName').textContent = name;
-      splash.classList.add('hide');
-      setTimeout(() => { splash.style.display = 'none'; }, 800);
-      initApp();
-    });
-    splashName.addEventListener('keypress', (e) => { if (e.key === 'Enter') splashBtn.click(); });
-
-    // ===== MENU =====
-    const menuBtn = document.getElementById('menuBtn');
-    const menuClose = document.getElementById('menuClose');
-    const menuPanel = document.getElementById('menuPanel');
-    const menuOverlay = document.getElementById('menuOverlay');
-
-    function toggleMenu(open) {
-      menuPanel.classList.toggle('open', open);
-      menuOverlay.classList.toggle('open', open);
-    }
-    menuBtn.addEventListener('click', () => toggleMenu(true));
-    menuClose.addEventListener('click', () => toggleMenu(false));
-    menuOverlay.addEventListener('click', () => toggleMenu(false));
-
-    document.querySelectorAll('.menu-panel .sb-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const nav = btn.dataset.nav;
-        if (nav) { navigate(nav); toggleMenu(false); }
-      });
-    });
-    document.getElementById('themeBtnMenu').addEventListener('click', () => {
-      renderThemeGrid();
-      document.getElementById('themeModal').classList.add('open');
-      toggleMenu(false);
-    });
-
-    // ===== BACKGROUND =====
-    const bgCanvas = document.getElementById('bgCanvas');
-    const bgCtx = bgCanvas.getContext('2d');
+    // Background particles
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
     let particles = [];
-    let mouseX = 0, mouseY = 0;
 
-    function resizeBg() {
-      bgCanvas.width = window.innerWidth;
-      bgCanvas.height = window.innerHeight;
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    resizeBg();
+    resize();
+    window.addEventListener('resize', resize);
 
     class Particle {
       constructor() {
-        this.x = Math.random() * bgCanvas.width;
-        this.y = Math.random() * bgCanvas.height;
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
         this.size = Math.random() * 2 + 1;
         this.speedX = (Math.random() - 0.5) * 0.5;
         this.speedY = (Math.random() - 0.5) * 0.5;
@@ -495,20 +159,15 @@
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        // Follow mouse slightly
-        const dx = mouseX - this.x;
-        const dy = mouseY - this.y;
-        this.x += dx * 0.0005;
-        this.y += dy * 0.0005;
-        if (this.x < 0 || this.x > bgCanvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > bgCanvas.height) this.speedY *= -1;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
       }
       draw() {
-        bgCtx.beginPath();
-        bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        bgCtx.fillStyle = this.color;
-        bgCtx.globalAlpha = this.opacity;
-        bgCtx.fill();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.opacity;
+        ctx.fill();
       }
     }
 
@@ -517,7 +176,7 @@
     }
 
     function animateBg() {
-      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       particles.forEach(p => { p.update(); p.draw(); });
       // Draw connections
       for (let i = 0; i < particles.length; i++) {
@@ -526,12 +185,12 @@
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 150) {
-            bgCtx.beginPath();
-            bgCtx.moveTo(particles[i].x, particles[i].y);
-            bgCtx.lineTo(particles[j].x, particles[j].y);
-            bgCtx.strokeStyle = 'rgba(249,168,212,0.05)';
-            bgCtx.lineWidth = 1;
-            bgCtx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = 'rgba(249,168,212,0.05)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
           }
         }
       }
@@ -539,877 +198,36 @@
     }
     animateBg();
 
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    window.addEventListener('resize', resizeBg);
-
-    // ===== ANIME CHARACTER =====
-    const aC = document.getElementById('animeCanvas');
-    const aCtx = aC.getContext('2d');
-    let animTime = 0, mood = 'happy', blink = 0;
-
-    function resizeAnime() { aC.width = aC.clientWidth; aC.height = aC.clientHeight; }
-    resizeAnime(); window.addEventListener('resize', resizeAnime);
-
-    function drawAnime() {
-      const ctx = aCtx, w = aC.width, h = aC.height;
-      ctx.clearRect(0,0,w,h);
-      const cx = w/2, cy = h/2 + 15, sc = Math.min(w,h)/440;
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      ctx.save(); 
-      ctx.translate(cx, cy); 
-      ctx.scale(sc, sc);
-      const breath = Math.sin(animTime*2.2)*3.5;
-
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.08)'; 
-      ctx.beginPath(); 
-      ctx.ellipse(0, 160, 60, 10, 0, 0, Math.PI*2); 
-      ctx.fill();
-
-      // Twin tails
-      const pigSwing = Math.sin(animTime*3.5)*5;
-      ctx.fillStyle = '#1a0a2e';
-      ctx.beginPath(); 
-      ctx.moveTo(-52, -30);
-      ctx.quadraticCurveTo(-68, -20, -72, 10);
-      ctx.quadraticCurveTo(-68, 25, -56, 20);
-      ctx.quadraticCurveTo(-50, 15, -48, 0);
-      ctx.quadraticCurveTo(-46, -15, -52, -30);
-      ctx.fill();
-      
-      ctx.beginPath(); 
-      ctx.moveTo(52, -30);
-      ctx.quadraticCurveTo(68, -20, 72, 10);
-      ctx.quadraticCurveTo(68, 25, 56, 20);
-      ctx.quadraticCurveTo(50, 15, 48, 0);
-      ctx.quadraticCurveTo(46, -15, 52, -30);
-      ctx.fill();
-
-      // Ribbons
-      for (let s=-1; s<=1; s+=2) {
-        ctx.save();
-        ctx.translate(s*46, -18);
-        ctx.rotate(s*0.4 + Math.sin(animTime*2 + s)*0.05);
-        
-        ctx.fillStyle = '#ff6b9d';
-        ctx.beginPath(); 
-        ctx.roundRect(-12,-4,24,8,4); 
-        ctx.fill();
-        ctx.rotate(-s*0.8);
-        ctx.beginPath(); 
-        ctx.roundRect(-12,-4,24,8,4); 
-        ctx.fill();
-        
-        ctx.restore();
-        
-        ctx.fillStyle = '#ff4070';
-        ctx.beginPath(); 
-        ctx.arc(s*46, -18, 4.5, 0, Math.PI*2); 
-        ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.beginPath(); 
-        ctx.arc(s*46-1.5, -20, 1.5, 0, Math.PI*2); 
-        ctx.fill();
-      }
-
-      // Body
-      const dressGrad = ctx.createLinearGradient(0, 50+breath, 0, 140+breath);
-      dressGrad.addColorStop(0, '#fbcfe8');
-      dressGrad.addColorStop(0.5, '#f9a8d4');
-      dressGrad.addColorStop(1, '#f9a8d4');
-      ctx.fillStyle = dressGrad;
-      ctx.beginPath(); 
-      ctx.ellipse(0, 52+breath, 38, 54, 0, 0, Math.PI*2); 
-      ctx.fill();
-      
-      ctx.fillStyle = '#f9a8d4';
-      ctx.beginPath(); 
-      ctx.moveTo(-32, 82+breath);
-      ctx.quadraticCurveTo(-38, 130+breath, -56, 145+breath);
-      ctx.lineTo(56, 145+breath);
-      ctx.quadraticCurveTo(38, 130+breath, 32, 82+breath);
-      ctx.fill();
-      
-      ctx.fillStyle = '#ff6b9d';
-      ctx.fillRect(-34, 78+breath, 68, 5);
-
-      // Skirt
-      ctx.fillStyle = '#f9a8d4';
-      ctx.beginPath(); 
-      ctx.moveTo(-56, 145+breath);
-      ctx.quadraticCurveTo(-62, 162+breath, -50, 174+breath);
-      ctx.lineTo(50, 174+breath);
-      ctx.quadraticCurveTo(62, 162+breath, 56, 145+breath);
-      ctx.fill();
-
-      // Legs
-      ctx.fillStyle = '#fff5ee';
-      ctx.fillRect(-18, 174+breath, 11, 30);
-      ctx.fillRect(7, 174+breath, 11, 30);
-      
-      ctx.fillStyle = '#2a1a1a';
-      ctx.beginPath(); 
-      ctx.ellipse(-10, 204+breath, 10, 5, 0, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath(); 
-      ctx.ellipse(13, 204+breath, 10, 5, 0, 0, Math.PI*2);
-      ctx.fill();
-
-      // Arms
-      const armSwing = Math.sin(animTime*2.8)*7;
-      ctx.fillStyle = '#fff5ee';
-      ctx.save();
-      ctx.translate(-30, 30+breath);
-      ctx.rotate(0.4 + armSwing*0.012);
-      ctx.beginPath(); 
-      ctx.roundRect(-6, 0, 12, 34, 5);
-      ctx.fill();
-      ctx.restore();
-      
-      ctx.save();
-      ctx.translate(30, 30+breath);
-      ctx.rotate(-0.4 - armSwing*0.012);
-      ctx.beginPath(); 
-      ctx.roundRect(-6, 0, 12, 34, 5);
-      ctx.fill();
-      ctx.restore();
-      
-      ctx.beginPath(); 
-      ctx.arc(-34+armSwing, 62+breath, 7, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath(); 
-      ctx.arc(34-armSwing, 62+breath, 7, 0, Math.PI*2);
-      ctx.fill();
-
-      // Head
-      ctx.fillStyle = '#fff5ee';
-      ctx.beginPath(); 
-      ctx.arc(0, -60+breath, 46, 0, Math.PI*2);
-      ctx.fill();
-
-      // Hair
-      ctx.fillStyle = '#1a0a2e';
-      ctx.beginPath(); 
-      ctx.arc(0, -64+breath, 48, Math.PI, 0);
-      ctx.fill();
-
-      ctx.beginPath(); 
-      ctx.moveTo(-42, -70+breath);
-      ctx.quadraticCurveTo(-28, -98+breath, 0, -96+breath);
-      ctx.quadraticCurveTo(28, -98+breath, 42, -70+breath);
-      ctx.quadraticCurveTo(20, -74+breath, 0, -72+breath);
-      ctx.quadraticCurveTo(-20, -74+breath, -42, -70+breath);
-      ctx.fill();
-
-      // Bangs
-      ctx.fillStyle = '#1a0a2e';
-      ctx.beginPath();
-      ctx.moveTo(-44, -68+breath);
-      ctx.quadraticCurveTo(-34, -88+breath, -20, -82+breath);
-      ctx.quadraticCurveTo(-16, -86+breath, -10, -80+breath);
-      ctx.quadraticCurveTo(-6, -86+breath, 0, -80+breath);
-      ctx.quadraticCurveTo(6, -86+breath, 10, -80+breath);
-      ctx.quadraticCurveTo(16, -86+breath, 20, -82+breath);
-      ctx.quadraticCurveTo(34, -88+breath, 44, -68+breath);
-      ctx.fill();
-
-      // Eyes
-      const eyeY = -52+breath;
-      const blinkH = blink < 0.12 ? 1 : (blink < 0.22 ? 0.08 : 1);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); 
-      ctx.ellipse(-18, eyeY, 14*blinkH, 17, 0, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath(); 
-      ctx.ellipse(18, eyeY, 14*blinkH, 17, 0, 0, Math.PI*2);
-      ctx.fill();
-
-      if (blinkH > 0.4) {
-        ctx.fillStyle = '#8b5cf6';
-        ctx.beginPath(); 
-        ctx.arc(-18, eyeY+2, 10, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath(); 
-        ctx.arc(18, eyeY+2, 10, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle = '#1a0a2e';
-        ctx.beginPath(); 
-        ctx.arc(-18, eyeY+3, 5.5, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath(); 
-        ctx.arc(18, eyeY+3, 5.5, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); 
-        ctx.arc(-22, eyeY-7, 3.5, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath(); 
-        ctx.arc(14, eyeY-7, 3.5, 0, Math.PI*2);
-        ctx.fill();
-        
-        ctx.beginPath(); 
-        ctx.arc(-15, eyeY-10, 2, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath(); 
-        ctx.arc(22, eyeY-10, 2, 0, Math.PI*2);
-        ctx.fill();
-      }
-
-      // Eyelashes
-      ctx.strokeStyle = '#1a0a2e';
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(-30, eyeY-18);
-      ctx.quadraticCurveTo(-22, eyeY-26, -12, eyeY-22);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(30, eyeY-18);
-      ctx.quadraticCurveTo(22, eyeY-26, 12, eyeY-22);
-      ctx.stroke();
-
-      // Blush
-      ctx.fillStyle = mood==='happy' ? 'rgba(255,130,150,0.2)' : 'rgba(255,160,170,0.25)';
-      ctx.beginPath();
-      ctx.ellipse(-30, eyeY+14, 13, 6, 0, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(30, eyeY+14, 13, 6, 0, 0, Math.PI*2);
-      ctx.fill();
-
-      // Eyebrows
-      ctx.strokeStyle = '#1a0a2e';
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.moveTo(-30, eyeY-24);
-      ctx.quadraticCurveTo(-22, eyeY-30, -12, eyeY-26);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(30, eyeY-24);
-      ctx.quadraticCurveTo(22, eyeY-30, 12, eyeY-26);
-      ctx.stroke();
-
-      // Nose
-      ctx.strokeStyle = '#e8c8b8';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(0, eyeY+6);
-      ctx.quadraticCurveTo(0, eyeY+11, 2, eyeY+10);
-      ctx.stroke();
-
-      // Mouth
-      ctx.strokeStyle = '#d4888a';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      if (mood==='happy') {
-        ctx.arc(0, eyeY+24, 10, 0.1, Math.PI-0.1);
-      } else {
-        ctx.arc(0, eyeY+30, 9, Math.PI+0.1, -0.1);
-      }
-      ctx.stroke();
-
-      // Choker
-      ctx.fillStyle = '#ff6b9d';
-      ctx.fillRect(-16, 22+breath, 32, 4.5);
-      ctx.fillStyle = '#ff4070';
-      ctx.beginPath();
-      ctx.arc(0, 24+breath, 4, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '5px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('♥', 0, 25+breath);
-
-      ctx.restore();
-      
-      document.getElementById('animeStatus').textContent = mood === 'happy' ? '🌸 Счастлива' : '😔 Грустно';
-    }
-
-    function animateAnime(time) {
-      animTime = time*0.001;
-      blink = (time*0.001)%3.2;
-      if (blink > 3.0) blink = (blink-3.0)*6; else blink = 0;
-      drawAnime();
-      requestAnimationFrame(animateAnime);
-    }
-    requestAnimationFrame(animateAnime);
-
-    function setMood(m) { 
-      mood = m; 
-      document.getElementById('animeStatus').textContent = m === 'happy' ? '🌸 Счастлива' : '😔 Грустно';
-    }
-    function animeHappy() { setMood('happy'); say('Отлично! Ты умничка! 🌸✨'); }
-    function animeSad() { setMood('sad'); say('Ничего страшного! Давай ещё раз! 💖'); }
-    function say(t, d=2500) { 
-      const e=document.getElementById('animeSpeech'); 
-      e.textContent=t; 
-      e.classList.add('show'); 
-      clearTimeout(e._t); 
-      e._t=setTimeout(()=>e.classList.remove('show'), d); 
-    }
-    document.getElementById('animeBox').addEventListener('click', ()=>{ 
-      setMood('happy'); 
-      say('Привет! Я Мисаки, рада тебя видеть! 🌸'); 
-    });
-
-    // ===== APP LOGIC =====
-    let gems=50, streak=0, hearts=5, maxH=5, xp=0, xpGoal=100, level=1, totalOk=0, currNav='translate', currTask=null, answering=false, vocab=[];
-
-    const extraInfo = {
-      adventure: { example: 'Let\'s go on an adventure!', extra: '📖 Существительное' },
-      universe: { example: 'The universe is infinite.', extra: '📖 Существительное' },
-      treasure: { example: 'They found hidden treasure.', extra: '📖 Существительное' },
-      rainbow: { example: 'Look at the beautiful rainbow!', extra: '📖 Существительное' },
-      inspiration: { example: 'She is my inspiration.', extra: '📖 Существительное' },
-      freedom: { example: 'Everyone wants freedom.', extra: '📖 Существительное' },
-      bravery: { example: 'He showed great bravery.', extra: '📖 Существительное' },
-      wisdom: { example: 'Wisdom comes with age.', extra: '📖 Существительное' },
-      amazing: { example: 'This is amazing!', extra: '📖 Прилагательное' },
-      friendship: { example: 'True friendship is precious.', extra: '📖 Существительное' },
-      goes: { rule: '📐 Present Simple: he/she/it + V-s/es' },
-      are: { rule: '📐 Present Continuous: they + are + V-ing' },
-      never: { rule: '📐 Present Perfect: have/has + never + V3' },
-      were: { rule: '📐 Second Conditional: If + Past Simple (were для всех лиц)' },
-      was: { rule: '📐 Passive Voice: was/were + V3' },
-      went: { rule: '📐 Past Simple: went — неправильный глагол' },
-      'is singing': { rule: '📐 Present Continuous: she + is + V-ing' },
-      'Очень легко': { example: 'This test is a piece of cake!', extra: '🍰 Используй, когда что-то простое' },
-      'Начать учиться': { example: 'I need to hit the books for my exam.', extra: '📚 Используй перед экзаменами' },
-      'Выдать секрет': { example: 'She spilled the beans about the party.', extra: '🤫 Используй, когда кто-то раскрыл секрет' },
-      'Плохо себя чувствовать': { example: 'I feel under the weather today.', extra: '🤒 Используй, когда болеешь' },
-      'Очень дорого': { example: 'This car costs an arm and a leg!', extra: '💰 Используй, когда что-то слишком дорогое' },
-      'Сдаваться': { example: 'Don\'t give up! Keep trying!', extra: '💪 Используй для поддержки' },
-      'Отправляться': { example: 'We set off early in the morning.', extra: '🚀 Используй о начале путешествия' },
-      'Узнать': { example: 'I need to find out the truth.', extra: '🔍 Используй о получении информации' },
-      'Уважать': { example: 'I look up to my parents.', extra: '🌟 Используй о восхищении людьми' },
-      'Откладывать': { example: 'Don\'t put off your homework.', extra: '⏰ Используй о прокрастинации' },
-      'Включать': { example: 'Please turn on the lights.', extra: '💡 Используй о включении устройств' },
-    };
-
-    const DB = {
-      translate: [
-        { type:'choice', q:'Как перевести <b>приключение</b>?', opts:['adventure','advantage','advertisement','addition'], ans:'adventure' },
-        { type:'choice', q:'Как перевести <b>вселенная</b>?', opts:['universe','university','universal','unicorn'], ans:'universe' },
-        { type:'choice', q:'Как перевести <b>сокровище</b>?', opts:['treasure','pressure','measure','pleasure'], ans:'treasure' },
-        { type:'choice', q:'Как перевести <b>радуга</b>?', opts:['raincoat','rainbow','raindrop','rainfall'], ans:'rainbow' },
-        { type:'choice', q:'Как перевести <b>вдохновение</b>?', opts:['inspiration','installation','institution','integration'], ans:'inspiration' },
-        { type:'write', q:'Напиши перевод: <b>свобода</b>', ans:'freedom' },
-        { type:'write', q:'Напиши перевод: <b>храбрость</b>', ans:'bravery' },
-        { type:'write', q:'Напиши перевод: <b>мудрость</b>', ans:'wisdom' },
-        { type:'choice', q:'Как перевести <b>удивительный</b>?', opts:['amazing','boring','terrible','usual'], ans:'amazing' },
-        { type:'choice', q:'Как перевести <b>дружба</b>?', opts:['friendship','relationship','partnership','leadership'], ans:'friendship' },
-      ],
-      grammar: [
-        { q:'She ___ to school every day.', opts:['go','goes','going','gone'], ans:'goes', hint:'he/she/it → +s' },
-        { q:'They ___ playing now.', opts:['is','are','am','be'], ans:'are', hint:'they → are' },
-        { q:'I have ___ been to Paris.', opts:['never','ever','yet','already'], ans:'never', hint:'never = никогда' },
-        { q:'If I ___ you, I would study.', opts:['am','was','were','be'], ans:'were', hint:'Second Conditional → were' },
-        { q:'The letter ___ sent yesterday.', opts:['is','was','were','has'], ans:'was', hint:'Past Passive → was' },
-        { q:'We ___ to the cinema last night.', opts:['go','went','gone','going'], ans:'went', hint:'Past Simple → went' },
-        { q:'She ___ a beautiful song now.', opts:['sing','sings','is singing','sang'], ans:'is singing', hint:'now → Present Continuous' },
-      ],
-      listening: [
-        { q:'🔊 Напиши слово: <b>[ˈbjuːtɪfəl]</b>', ans:'beautiful', hint:'Красивый', example:'She is a beautiful girl.' },
-        { q:'🔊 Напиши слово: <b>[ˈwʌndərfəl]</b>', ans:'wonderful', hint:'Чудесный', example:'What a wonderful day!' },
-        { q:'🔊 Напиши слово: <b>[dɪˈlɪʃəs]</b>', ans:'delicious', hint:'Вкусный', example:'This food is delicious.' },
-        { q:'🔊 Напиши слово: <b>[ɪkˈstrɔːrdɪnəri]</b>', ans:'extraordinary', hint:'Необычайный', example:'She has extraordinary talent.' },
-        { q:'🔊 Напиши слово: <b>[kəmˈpjuːtər]</b>', ans:'computer', hint:'Компьютер', example:'I work on my computer.' },
-      ],
-      speaking: [
-        { q:'🎤 Произнеси: <b>beautiful</b>', ans:'beautiful', hint:'[ˈbjuːtɪfəl] — красивый', example:'Beautiful day, isn\'t it?' },
-        { q:'🎤 Произнеси: <b>wonderful</b>', ans:'wonderful', hint:'[ˈwʌndərfəl] — чудесный', example:'Wonderful weather today!' },
-        { q:'🎤 Произнеси: <b>delicious</b>', ans:'delicious', hint:'[dɪˈlɪʃəs] — вкусный', example:'This cake is delicious!' },
-        { q:'🎤 Произнеси: <b>extraordinary</b>', ans:'extraordinary', hint:'[ɪkˈstrɔːrdɪnəri] — необычайный', example:'Extraordinary performance!' },
-      ],
-      reading: [
-        { text:'Tom is a student from London. He wakes up at 7 AM and goes to school. He loves English and dreams of traveling the world.', q:'Where is Tom from?', opts:['London','Paris','New York','Tokyo'], ans:'London', newWords:'student (студент), wake up (просыпаться), travel (путешествовать)' },
-        { text:'Sarah went to the market. She bought fresh fruits, vegetables, and bread. The weather was sunny, so she walked home.', q:'What did Sarah buy?', opts:['Fruits and vegetables','Clothes','Books','Electronics'], ans:'Fruits and vegetables', newWords:'market (рынок), fresh (свежий), purchases (покупки)' },
-        { text:'The Eiffel Tower is in Paris. It was built in 1889. Millions of tourists visit it every year.', q:'Where is the Eiffel Tower?', opts:['London','Paris','Rome','Berlin'], ans:'Paris', newWords:'built (построен), tourists (туристы), landmarks (достопримечательности)' },
-      ],
-      writing: [
-        { q:'✍️ Опиши свой обычный день на английском.', hint:'Начни с: "I wake up at...", "Then I go to...", "In the evening I..."' },
-        { q:'✍️ Напиши о своём любимом хобби.', hint:'Начни с: "My hobby is...", "I enjoy...", "It makes me feel..."' },
-        { q:'✍️ Опиши свою семью на английском.', hint:'Начни с: "My family has...", "My mother is...", "We like to..."' },
-      ],
-      quiz: [
-        { q:'Сколько времён в английском языке?', opts:['12','3','6','24'], ans:'12', fact:'12 времён: 4 группы × 3 времени' },
-        { q:'Что означает идиома "break a leg"?', opts:['Сломать ногу','Удачи!','Бежать','Танцевать'], ans:'Удачи!', fact:'Используется в театре перед выступлением' },
-        { q:'Синоним слова "big"?', opts:['small','large','tiny','narrow'], ans:'large', fact:'Large — самый близкий синоним' },
-        { q:'Какая буква самая распространённая в английском?', opts:['A','E','I','O'], ans:'E', fact:'Буква E встречается чаще всего' },
-        { q:'Что означает "the apple of my eye"?', opts:['Глазное яблоко','Самый дорогой человек','Красное яблоко','Больной глаз'], ans:'Самый дорогой человек', fact:'Идиома о самом любимом человеке' },
-        { q:'Сколько дней в феврале в високосный год?', opts:['28','29','30','31'], ans:'29', fact:'В високосный год 366 дней' },
-      ],
-      idioms: [
-        { q:'Что значит <b>"piece of cake"</b>?', opts:['Кусок торта','Очень легко','Сложно','Вкусно'], ans:'Очень легко', example:'This exam is a piece of cake!' },
-        { q:'Что значит <b>"hit the books"</b>?', opts:['Ударить книги','Начать учиться','Закрыть книгу','Написать книгу'], ans:'Начать учиться', example:'I need to hit the books for my test.' },
-        { q:'Что значит <b>"spill the beans"</b>?', opts:['Рассмешить','Пролить бобы','Выдать секрет','Приготовить еду'], ans:'Выдать секрет', example:'She spilled the beans about the surprise.' },
-        { q:'Что значит <b>"under the weather"</b>?', opts:['Под погодой','Плохо себя чувствовать','На улице','Счастливый'], ans:'Плохо себя чувствовать', example:'I feel under the weather today.' },
-        { q:'Что значит <b>"cost an arm and a leg"</b>?', opts:['Стоить руку и ногу','Очень дорого','Дёшево','Бесплатно'], ans:'Очень дорого', example:'This car costs an arm and a leg!' },
-      ],
-      phrasal: [
-        { q:'Что значит <b>"give up"</b>?', opts:['Дать вверх','Сдаваться','Отдавать','Поднимать'], ans:'Сдаваться', example:'Never give up on your dreams!' },
-        { q:'Что значит <b>"set off"</b>?', opts:['Установить','Отправляться','Выключать','Садиться'], ans:'Отправляться', example:'We set off at sunrise.' },
-        { q:'Что значит <b>"find out"</b>?', opts:['Найти снаружи','Узнать','Потерять','Искать'], ans:'Узнать', example:'I need to find out the answer.' },
-        { q:'Что значит <b>"look up to"</b>?', opts:['Смотреть вверх','Уважать','Искать','Видеть'], ans:'Уважать', example:'I look up to my teacher.' },
-        { q:'Что значит <b>"put off"</b>?', opts:['Положить','Откладывать','Включать','Убирать'], ans:'Откладывать', example:'Don\'t put off your homework.' },
-        { q:'Что значит <b>"turn on"</b>?', opts:['Включать','Выключать','Поворачивать','Открывать'], ans:'Включать', example:'Turn on the TV, please.' },
-      ],
-    };
-
-    let pool = [...DB.translate];
-    function getTask(db) { if (pool.length===0) pool=[...db]; return pool.splice(Math.floor(Math.random()*pool.length),1)[0]; }
-
-    function showExplanation(id, isCorrect, ans, extra) {
-      const el = document.getElementById(id);
-      const info = extraInfo[ans] || {};
-      const exp = extra || '';
-      if (isCorrect) { 
-        el.textContent = '✅ Правильно! ' + (exp || ans + ' — верный ответ.');
-        if (info.example) el.textContent += ' Пример: ' + info.example;
-        el.className = 'explanation ok'; 
-      } else { 
-        el.textContent = '❌ Ошибка! Правильный ответ: ' + ans + '. ' + (exp || '');
-        if (info.example) el.textContent += ' Пример: ' + info.example;
-        el.className = 'explanation err'; 
-      }
-    }
-
-    // ===== PAGE LOADERS =====
-    function loadTranslate() {
-      if (hearts<=0) { document.getElementById('transQ').innerHTML='💔 Жизни кончились!'; return; }
-      currTask = getTask(DB.translate);
-      document.getElementById('transQ').innerHTML = currTask.q;
-      document.getElementById('transExplanation').textContent = '';
-      document.getElementById('transExplanation').className = 'explanation';
-      const info = extraInfo[currTask.ans] || {};
-      document.getElementById('transExample').textContent = info.example ? '📌 ' + info.example : '';
-      answering = false;
-      if (currTask.type==='choice') {
-        document.getElementById('transGrid').classList.remove('hidden');
-        document.getElementById('transWriteRow').classList.add('hidden');
-        const g = document.getElementById('transGrid'); g.innerHTML='';
-        [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>pickChoice(b,o,'transGrid','transExplanation',DB.translate,loadTranslate); g.appendChild(b); });
-      } else {
-        document.getElementById('transGrid').classList.add('hidden');
-        document.getElementById('transWriteRow').classList.remove('hidden');
-        document.getElementById('transWriteInp').value='';
-      }
-    }
-
-    function pickChoice(btn, chosen, gridId, explId, db, reloadFn) {
-      if (answering) return;
-      answering = true;
-      document.querySelectorAll(`#${gridId} .opt-btn`).forEach(b=>b.style.pointerEvents='none');
-      if (chosen===currTask.ans) { btn.classList.add('correct'); showExplanation(explId, true, currTask.ans); win(); }
-      else { btn.classList.add('wrong'); document.querySelectorAll(`#${gridId} .opt-btn`).forEach(b=>{ if(b.textContent===currTask.ans) b.classList.add('correct'); }); showExplanation(explId, false, currTask.ans); lose(); }
-      setTimeout(()=>{ answering=false; pool=[...db]; reloadFn(); }, 2200);
-    }
-
-    function submitWrite(inpId, explId, db, reloadFn) {
-      if (answering) return;
-      const inp = document.getElementById(inpId); const v = inp.value.trim().toLowerCase(); if (!v) return;
-      answering = true;
-      if (v===currTask.ans.toLowerCase()) { inp.style.borderColor='#34d399'; showExplanation(explId, true, currTask.ans); win(); }
-      else { inp.style.borderColor='#f87171'; showExplanation(explId, false, currTask.ans); lose(); }
-      setTimeout(()=>{ answering=false; pool=[...db]; reloadFn(); }, 2200);
-    }
-
-    function loadGrammar() {
-      currTask = DB.grammar[Math.floor(Math.random()*DB.grammar.length)];
-      document.getElementById('gramQ').innerHTML = currTask.q + (currTask.hint ? ` <span style="font-size:12px;font-weight:400;color:var(--text2);">(${currTask.hint})</span>` : '');
-      document.getElementById('gramExplanation').textContent = '';
-      document.getElementById('gramExplanation').className = 'explanation';
-      const info = extraInfo[currTask.ans] || {};
-      document.getElementById('gramRule').textContent = info.rule || '';
-      const g = document.getElementById('gramGrid'); g.innerHTML='';
-      [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>{ if(b.dataset.done) return; document.querySelectorAll('#gramGrid .opt-btn').forEach(bb=>bb.dataset.done='1'); if(o===currTask.ans){ b.classList.add('correct'); showExplanation('gramExplanation', true, currTask.ans); win(); } else { b.classList.add('wrong'); document.querySelectorAll('#gramGrid .opt-btn').forEach(bb=>{ if(bb.textContent===currTask.ans) bb.classList.add('correct'); }); showExplanation('gramExplanation', false, currTask.ans); lose(); } setTimeout(()=>{ document.querySelectorAll('#gramGrid .opt-btn').forEach(bb=>bb.dataset.done=''); loadGrammar(); }, 2200); }; g.appendChild(b); });
-    }
-
-    function loadListening() { 
-      currTask = DB.listening[Math.floor(Math.random()*DB.listening.length)]; 
-      document.getElementById('listenQ').innerHTML = currTask.q;
-      document.getElementById('listenInp').value=''; 
-      document.getElementById('listenExplanation').textContent=''; 
-      document.getElementById('listenExplanation').className='explanation';
-      document.getElementById('listenExtra').textContent = currTask.hint ? '💡 ' + currTask.hint : '';
-    }
-
-    function playAudio() { 
-      if (currTask && 'speechSynthesis' in window) { 
-        speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(currTask.ans); 
-        u.lang='en-US'; u.rate=0.7; 
-        speechSynthesis.speak(u); 
-      } 
-    }
-
-    function checkListen() { 
-      if (!currTask) return; 
-      const v = document.getElementById('listenInp').value.trim().toLowerCase(); 
-      if (!v) return; 
-      if (v===currTask.ans.toLowerCase()) { 
-        document.getElementById('listenInp').style.borderColor='#34d399'; 
-        showExplanation('listenExplanation', true, currTask.ans); 
-        win(); 
-      } else { 
-        document.getElementById('listenInp').style.borderColor='#f87171'; 
-        showExplanation('listenExplanation', false, currTask.ans); 
-        lose(); 
-      } 
-      setTimeout(loadListening, 2200); 
-    }
-
-    function loadSpeaking() { 
-      currTask = DB.speaking[Math.floor(Math.random()*DB.speaking.length)]; 
-      document.getElementById('speakQ').innerHTML = currTask.q;
-      document.getElementById('speakInp').value=''; 
-      document.getElementById('speakExplanation').textContent=''; 
-      document.getElementById('speakExplanation').className='explanation';
-      document.getElementById('speakHint').textContent = currTask.hint || '';
-    }
-
-    function startSpeak() { 
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) { 
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition; 
-        const rec = new SR(); rec.lang='en-US'; rec.interimResults=false; 
-        document.getElementById('speakRec').textContent='🔴 Запись...'; 
-        rec.start(); 
-        rec.onresult = e => { 
-          document.getElementById('speakInp').value = e.results[0][0].transcript; 
-          document.getElementById('speakRec').textContent='🎤 Начать запись'; 
-        }; 
-        rec.onerror = () => { document.getElementById('speakRec').textContent='🎤 Начать запись'; }; 
-      } else { 
-        document.getElementById('speakInp').value = currTask.ans; 
-        toast('🎤 Демо', 'ok'); 
-      } 
-    }
-
-    function checkSpeak() { 
-      if (!currTask) return; 
-      const v = document.getElementById('speakInp').value.trim().toLowerCase(); 
-      if (!v) return; 
-      if (v.includes(currTask.ans.toLowerCase())) { 
-        showExplanation('speakExplanation', true, currTask.ans); 
-        win(); 
-      } else { 
-        showExplanation('speakExplanation', false, currTask.ans); 
-        lose(); 
-      } 
-      setTimeout(loadSpeaking, 2200); 
-    }
-
-    function loadReading() {
-      currTask = DB.reading[Math.floor(Math.random()*DB.reading.length)];
-      document.getElementById('readingText').textContent = currTask.text;
-      document.getElementById('readingQ').innerHTML = currTask.q;
-      document.getElementById('readingExplanation').textContent = '';
-      document.getElementById('readingExplanation').className = 'explanation';
-      document.getElementById('readingNewWords').textContent = currTask.newWords ? '📚 Новые слова: ' + currTask.newWords : '';
-      const g = document.getElementById('readingGrid'); g.innerHTML='';
-      [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>{ if(b.dataset.done) return; document.querySelectorAll('#readingGrid .opt-btn').forEach(bb=>bb.dataset.done='1'); if(o===currTask.ans){ b.classList.add('correct'); showExplanation('readingExplanation', true, currTask.ans); win(); } else { b.classList.add('wrong'); document.querySelectorAll('#readingGrid .opt-btn').forEach(bb=>{ if(bb.textContent===currTask.ans) bb.classList.add('correct'); }); showExplanation('readingExplanation', false, currTask.ans); lose(); } setTimeout(()=>{ document.querySelectorAll('#readingGrid .opt-btn').forEach(bb=>bb.dataset.done=''); loadReading(); }, 2200); }; g.appendChild(b); });
-    }
-
-    function loadWriting() { 
-      currTask = DB.writing[Math.floor(Math.random()*DB.writing.length)]; 
-      document.getElementById('writingQ').innerHTML = currTask.q;
-      document.getElementById('writingTips').textContent = '💡 ' + currTask.hint;
-      document.getElementById('writingInp').value=''; 
-      document.getElementById('writingExplanation').textContent=''; 
-      document.getElementById('writingExplanation').className='explanation'; 
-    }
-
-    function checkWriting() { 
-      const v = document.getElementById('writingInp').value.trim(); 
-      if (v.length<10) { toast('Напиши хотя бы 10 символов!', 'bad'); return; } 
-      showExplanation('writingExplanation', true, ''); 
-      win(); 
-      document.getElementById('writingInp').value=''; 
-      setTimeout(loadWriting, 1500); 
-    }
-
-    function loadQuiz() { 
-      currTask = DB.quiz[Math.floor(Math.random()*DB.quiz.length)]; 
-      document.getElementById('quizQ').innerHTML = currTask.q; 
-      document.getElementById('quizExplanation').textContent=''; 
-      document.getElementById('quizExplanation').className='explanation';
-      document.getElementById('quizFact').textContent = currTask.fact ? '💡 ' + currTask.fact : '';
-      const g = document.getElementById('quizGrid'); g.innerHTML=''; 
-      [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>{ if(b.dataset.done) return; document.querySelectorAll('#quizGrid .opt-btn').forEach(bb=>bb.dataset.done='1'); if(o===currTask.ans){ b.classList.add('correct'); showExplanation('quizExplanation', true, currTask.ans); win(); } else { b.classList.add('wrong'); document.querySelectorAll('#quizGrid .opt-btn').forEach(bb=>{ if(bb.textContent===currTask.ans) bb.classList.add('correct'); }); showExplanation('quizExplanation', false, currTask.ans); lose(); } setTimeout(()=>{ document.querySelectorAll('#quizGrid .opt-btn').forEach(bb=>bb.dataset.done=''); loadQuiz(); }, 2200); }; g.appendChild(b); }); 
-    }
-
-    function loadIdioms() { 
-      currTask = DB.idioms[Math.floor(Math.random()*DB.idioms.length)]; 
-      document.getElementById('idiomsQ').innerHTML = currTask.q; 
-      document.getElementById('idiomsExplanation').textContent=''; 
-      document.getElementById('idiomsExplanation').className='explanation';
-      const info = extraInfo[currTask.ans] || {};
-      document.getElementById('idiomsExtra').textContent = info.example ? '📌 ' + info.example : '';
-      const g = document.getElementById('idiomsGrid'); g.innerHTML=''; 
-      [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>{ if(b.dataset.done) return; document.querySelectorAll('#idiomsGrid .opt-btn').forEach(bb=>bb.dataset.done='1'); if(o===currTask.ans){ b.classList.add('correct'); showExplanation('idiomsExplanation', true, currTask.ans); win(); } else { b.classList.add('wrong'); document.querySelectorAll('#idiomsGrid .opt-btn').forEach(bb=>{ if(bb.textContent===currTask.ans) bb.classList.add('correct'); }); showExplanation('idiomsExplanation', false, currTask.ans); lose(); } setTimeout(()=>{ document.querySelectorAll('#idiomsGrid .opt-btn').forEach(bb=>bb.dataset.done=''); loadIdioms(); }, 2200); }; g.appendChild(b); }); 
-    }
-
-    function loadPhrasal() { 
-      currTask = DB.phrasal[Math.floor(Math.random()*DB.phrasal.length)]; 
-      document.getElementById('phrasalQ').innerHTML = currTask.q; 
-      document.getElementById('phrasalExplanation').textContent=''; 
-      document.getElementById('phrasalExplanation').className='explanation';
-      const info = extraInfo[currTask.ans] || {};
-      document.getElementById('phrasalExtra').textContent = info.example ? '📌 ' + info.example : '';
-      const g = document.getElementById('phrasalGrid'); g.innerHTML=''; 
-      [...currTask.opts].sort(()=>Math.random()-0.5).forEach(o=>{ const b=document.createElement('button'); b.className='opt-btn'; b.textContent=o; b.onclick=()=>{ if(b.dataset.done) return; document.querySelectorAll('#phrasalGrid .opt-btn').forEach(bb=>bb.dataset.done='1'); if(o===currTask.ans){ b.classList.add('correct'); showExplanation('phrasalExplanation', true, currTask.ans); win(); } else { b.classList.add('wrong'); document.querySelectorAll('#phrasalGrid .opt-btn').forEach(bb=>{ if(bb.textContent===currTask.ans) bb.classList.add('correct'); }); showExplanation('phrasalExplanation', false, currTask.ans); lose(); } setTimeout(()=>{ document.querySelectorAll('#phrasalGrid .opt-btn').forEach(bb=>bb.dataset.done=''); loadPhrasal(); }, 2200); }; g.appendChild(b); }); 
-    }
-
-    // ===== GAME MECHANICS =====
-    function win() { 
-      totalOk++; streak++; 
-      const gain=10+streak*2; 
-      xp+=gain; 
-      gems+=Math.floor(gain/3); 
-      if (xp>=xpGoal) { 
-        xp-=xpGoal; 
-        level++; 
-        xpGoal=Math.floor(xpGoal*1.15); 
-        modal('🎉 Уровень '+level+'!','Мисаки гордится тобой! Продолжай!'); 
-      } 
-      animeHappy(); 
-      toast('✅ +'+gain+' XP!','ok'); 
-      if (currTask?.ans && !vocab.find(w=>w.en===currTask.ans)) { 
-        const ru=currTask.q?.match(/<b>(.*?)<\/b>/)?.[1]||currTask.ans; 
-        vocab.push({en:currTask.ans,ru}); 
-      } 
-      updateUI(); 
-      updateLB(); 
-    }
-
-    function lose() { 
-      streak=0; 
-      hearts--; 
-      animeSad(); 
-      toast('❌ Ошибка','bad'); 
-      updateUI(); 
-      updateLB(); 
-    }
-
-    function toast(m,t) { 
-      const e=document.getElementById('toast'); 
-      e.textContent=m; 
-      e.className='toast '+t+' show'; 
-      clearTimeout(e._t); 
-      e._t=setTimeout(()=>e.classList.remove('show'),1800); 
-    }
-
-    function modal(title,txt) { 
-      document.getElementById('levelModalText').textContent=txt; 
-      document.getElementById('levelModal').classList.add('open'); 
-      setTimeout(()=>document.getElementById('levelModal').classList.remove('open'),3000); 
-    }
-
-    function updateUI() {
-      document.getElementById('gemsVal').textContent = gems;
-      document.getElementById('xpFill').style.width = Math.min((xp/xpGoal*100),100)+'%';
-      document.getElementById('xpLabel').textContent = xp+'/'+xpGoal;
-      const hr = document.getElementById('heartsRow'); hr.innerHTML='';
-      for (let i=0; i<maxH; i++) hr.innerHTML += `<span class="${i>=hearts?'empty':''}">❤️</span>`;
-      document.getElementById('statScore').textContent = totalOk*10;
-      document.getElementById('statStreak').textContent = streak;
-      document.getElementById('statCorrect').textContent = totalOk;
-      document.getElementById('statLevel').textContent = level;
-      document.getElementById('statWords').textContent = vocab.length;
-      if (currNav==='vocabulary') renderVocab();
-    }
-
-    function renderVocab() { 
-      const g=document.getElementById('vocabGrid'); 
-      g.innerHTML=''; 
-      document.getElementById('vocabEmpty').style.display=vocab.length?'none':''; 
-      vocab.forEach(w=>{ 
-        const d=document.createElement('div'); 
-        d.className='word-tile'; 
-        d.innerHTML=`<div class="word-en">${w.en}</div><div class="word-ru">${w.ru}</div>`; 
-        d.onclick=()=>{ 
-          if('speechSynthesis' in window){ 
-            const u=new SpeechSynthesisUtterance(w.en); 
-            u.lang='en-US'; u.rate=0.8; 
-            speechSynthesis.speak(u); 
-          } 
-        }; 
-        g.appendChild(d); 
-      }); 
-    }
-
-    // ===== CHAT =====
-    const chatCh = new BroadcastChannel('lv_chat_v3');
-    let chatMsgs = JSON.parse(localStorage.getItem('lv_chat_v3')||'[]');
-    function renderChat() { 
-      const a=document.getElementById('chatArea'); 
-      a.innerHTML=chatMsgs.slice(-50).map(m=>`<div class="chat-msg ${m.name===userName?'you':'other'}"><span class="author">${m.name}</span> ${m.text}</div>`).join(''); 
-      a.scrollTop=a.scrollHeight; 
-    }
-    function sendChat() { 
-      const inp=document.getElementById('chatInput'); 
-      const t=inp.value.trim(); 
-      if(!t) return; 
-      const m={name:userName,text:t,time:Date.now()}; 
-      chatMsgs.push(m); 
-      if(chatMsgs.length>200) chatMsgs=chatMsgs.slice(-200); 
-      localStorage.setItem('lv_chat_v3',JSON.stringify(chatMsgs)); 
-      chatCh.postMessage(m); 
-      inp.value=''; 
-      renderChat(); 
-    }
-    chatCh.onmessage = (e) => { 
-      chatMsgs.push(e.data); 
-      if(currNav==='chat') renderChat(); 
-    };
-
-    document.querySelectorAll('.quick-phrase').forEach(el => {
-      el.addEventListener('click', () => {
-        document.getElementById('chatInput').value = el.dataset.text;
-        sendChat();
-      });
-    });
-
-    // ===== LEADERBOARD =====
-    let lb = JSON.parse(localStorage.getItem('lv_lb_v3')||'[]');
-    function updateLB() { 
-      const ex=lb.find(l=>l.name===userName); 
-      if(ex){ex.score=totalOk;ex.level=level;} 
-      else lb.push({name:userName,score:totalOk,level}); 
-      lb.sort((a,b)=>b.score-a.score); 
-      lb=lb.slice(0,20); 
-      localStorage.setItem('lv_lb_v3',JSON.stringify(lb)); 
-      if(currNav==='leaderboard') renderLB(); 
-    }
-    function renderLB() { 
-      document.getElementById('leaderboardList').innerHTML = lb.map((l,i)=>`<p style="font-size:12px;padding:3px 0;">${i+1}. <b>${l.name}</b> — ⭐ ${l.score} | Ур. ${l.level}</p>`).join(''); 
-    }
-
-    // ===== NAVIGATION =====
-    function navigate(to) {
-      currNav = to;
-      document.querySelectorAll('[id^="page"]').forEach(el=>el.classList.add('hidden'));
-      const map = { translate:'pageTranslate', grammar:'pageGrammar', listening:'pageListening', speaking:'pageSpeaking', reading:'pageReading', writing:'pageWriting', quiz:'pageQuiz', idioms:'pageIdioms', phrasal:'pagePhrasal', chat:'pageChat', leaderboard:'pageLeaderboard', vocabulary:'pageVocabulary', stats:'pageStats' };
-      const el = document.getElementById(map[to]); 
-      if(el) el.classList.remove('hidden');
-      document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelector(`[data-nav="${to}"]`)?.classList.add('active');
-      document.querySelectorAll('.menu-panel .sb-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelector(`.menu-panel [data-nav="${to}"]`)?.classList.add('active');
-      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelector(`[data-nav="${to}"]`)?.classList.add('active');
-      if (to==='translate') { pool=[...DB.translate]; loadTranslate(); }
-      else if (to==='grammar') loadGrammar();
-      else if (to==='listening') loadListening();
-      else if (to==='speaking') loadSpeaking();
-      else if (to==='reading') loadReading();
-      else if (to==='writing') loadWriting();
-      else if (to==='quiz') loadQuiz();
-      else if (to==='idioms') loadIdioms();
-      else if (to==='phrasal') loadPhrasal();
-      else if (to==='chat') renderChat();
-      else if (to==='leaderboard') renderLB();
-      else if (to==='vocabulary') renderVocab();
-      else if (to==='stats') updateUI();
-      document.getElementById('mainScroll').scrollTop = 0;
-    }
-    window.navigate = navigate;
-
-    // ===== EVENT LISTENERS =====
-    document.getElementById('transCheck').addEventListener('click',()=>{ if(currTask?.type==='write') submitWrite('transWriteInp','transExplanation',DB.translate,loadTranslate); });
-    document.getElementById('transSkip').addEventListener('click',()=>{ pool=[...DB.translate]; loadTranslate(); });
-    document.getElementById('transWriteInp').addEventListener('keypress',e=>{ if(e.key==='Enter') submitWrite('transWriteInp','transExplanation',DB.translate,loadTranslate); });
-    document.getElementById('gramCheck').addEventListener('click',loadGrammar);
-    document.getElementById('listenPlay').addEventListener('click',playAudio);
-    document.getElementById('listenCheck').addEventListener('click',checkListen);
-    document.getElementById('listenInp').addEventListener('keypress',e=>{ if(e.key==='Enter') checkListen(); });
-    document.getElementById('speakRec').addEventListener('click',startSpeak);
-    document.getElementById('speakCheck').addEventListener('click',checkSpeak);
-    document.getElementById('readingCheck').addEventListener('click',loadReading);
-    document.getElementById('writingCheck').addEventListener('click',checkWriting);
-    document.getElementById('quizCheck').addEventListener('click',loadQuiz);
-    document.getElementById('idiomsCheck').addEventListener('click',loadIdioms);
-    document.getElementById('phrasalCheck').addEventListener('click',loadPhrasal);
-    document.getElementById('chatSend').addEventListener('click',sendChat);
-    document.getElementById('chatInput').addEventListener('keypress',e=>{ if(e.key==='Enter') sendChat(); });
-    document.getElementById('levelModalClose').addEventListener('click',()=>document.getElementById('levelModal').classList.remove('open'));
-    document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.nav)));
-
-    window.addEventListener('resize',()=>{ resizeAnime(); });
-
-    // ===== THEMES =====
-    const themes = {
-      sakura: { name:'🌸 Сакура', bg:'#0a0a18', color:'#ffc0cb' },
-      galaxy: { name:'🌌 Галактика', bg:'#020212', color:'#8899ff' },
-      ocean: { name:'🌊 Океан', bg:'#021025', color:'#44ccff' },
-      forest: { name:'🌿 Лес', bg:'#051008', color:'#88dd66' },
-      sunset: { name:'🌅 Закат', bg:'#150a08', color:'#ff9966' },
-      neon: { name:'💜 Неон', bg:'#0a0a1a', color:'#ff44ff' },
-      snow: { name:'❄️ Снег', bg:'#0a0a18', color:'#ffffff' },
-      fire: { name:'🔥 Огонь', bg:'#100505', color:'#ff6633' },
-      gold: { name:'✨ Золото', bg:'#0a0a08', color:'#ffcc44' },
-      dream: { name:'💭 Мечта', bg:'#0a0a20', color:'#cc88ff' }
-    };
-    let curTheme = 'sakura';
-
-    function changeTheme(k) {
-      curTheme = k;
-      document.body.style.background = themes[k].bg;
-      renderThemeGrid();
-    }
-    function renderThemeGrid() {
-      const g = document.getElementById('themeGrid');
-      g.innerHTML = '';
-      Object.entries(themes).forEach(([k,t]) => {
-        const b = document.createElement('button');
-        b.className = 'theme-opt' + (curTheme === k ? ' active' : '');
-        b.innerHTML = `<span class="t-emoji">${t.name.slice(0,2)}</span>${t.name.slice(2)}`;
-        b.onclick = () => { changeTheme(k); document.getElementById('themeModal').classList.remove('open'); };
-        g.appendChild(b);
-      });
-    }
-    renderThemeGrid();
-    document.getElementById('themeModal').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('open');
-    });
-
-    function initApp() {
-      updateLB(); 
-      navigate('translate'); 
-      updateUI();
-      setTimeout(()=>say('Привет! Я Мисаки, рада тебя видеть! 🌸',3000),600);
-    }
-
-    // Polyfill for roundRect
-    if (!CanvasRenderingContext2D.prototype.roundRect) {
-      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (r > w/2) r = w/2; 
-        if (r > h/2) r = h/2;
-        this.moveTo(x+r, y); 
-        this.arcTo(x+w, y, x+w, y+h, r); 
-        this.arcTo(x+w, y+h, x, y+h, r); 
-        this.arcTo(x, y+h, x, y, r); 
-        this.arcTo(x, y, x+w, y, r);
-        return this;
-      };
-    }
-
-    if (localStorage.getItem('lingua_name')) {
+    // Splash
+    const splash = document.getElementById('splash');
+    const splashName = document.getElementById('splashName');
+    const splashBtn = document.getElementById('splashBtn');
+    const app = document.getElementById('app');
+    const displayName = document.getElementById('displayName');
+
+    splashBtn.addEventListener('click', () => {
+      const name = splashName.value.trim() || 'студент';
+      localStorage.setItem('lingua_name', name);
+      displayName.textContent = name;
       splash.classList.add('hide');
-      setTimeout(() => { splash.style.display = 'none'; }, 800);
-      document.getElementById('displayName').textContent = localStorage.getItem('lingua_name');
-      initApp();
+      setTimeout(() => {
+        splash.style.display = 'none';
+        app.style.display = 'block';
+      }, 800);
+    });
+
+    splashName.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') splashBtn.click();
+    });
+
+    // Auto-start if name exists
+    if (localStorage.getItem('lingua_name')) {
+      displayName.textContent = localStorage.getItem('lingua_name');
+      splash.classList.add('hide');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        app.style.display = 'block';
+      }, 800);
     }
   </script>
 </body>
